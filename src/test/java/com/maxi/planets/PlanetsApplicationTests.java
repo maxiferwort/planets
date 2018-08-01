@@ -8,10 +8,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maxi.planets.persistence.model.Day;
 import com.maxi.planets.persistence.model.WeatherReport;
+import com.maxi.planets.service.JobService;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +34,14 @@ public class PlanetsApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
 
+	@Autowired
+	private JobService jobService;
+
+	@Before
+	public void construct()
+			throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+		jobService.runYearJob(0d, 0d, 0d);
+	}
 
 	@Test
 	public void testDiasLluvia() throws Exception {
