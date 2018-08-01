@@ -19,7 +19,7 @@ public class PlanetService {
 
   public static final BigDecimal VALUE_OF_360 = BigDecimal.valueOf(360);
 
-  public static final double ERROR_TOLERANCE = 0.1;
+  public static final double ERROR_TOLERANCE = 0.05;
   @Autowired
   private PlanetRepository planetRepository;
 
