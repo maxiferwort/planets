@@ -1,6 +1,5 @@
 package com.maxi.planets.service;
 
-
 import static com.maxi.planets.TestUtils.nextBigDecimal;
 import static com.maxi.planets.persistence.model.Civilization.BETASOIDES;
 import static com.maxi.planets.persistence.model.Civilization.FERENGIES;
