@@ -19,11 +19,14 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(exclude = {BatchAutoConfiguration.class})
@@ -54,9 +57,10 @@ public class PlanetsApplication extends DefaultBatchConfigurer {
 
   @Bean
   @StepScope
-  public IteratorItemReader<Long> reader() {
+  public IteratorItemReader<Long> reader(@Value("#{jobParameters['start']}") Long start,
+      @Value("#{jobParameters['end']}") Long end) {
     List<Long> days = new ArrayList<>();
-    for (long i = 0; i < 360 * 1; i++) {
+    for (long i = start; i < end * 1; i++) {
       days.add(i);
     }
     return new IteratorItemReader<Long>(days);
@@ -82,6 +86,15 @@ public class PlanetsApplication extends DefaultBatchConfigurer {
   }
 
   @Bean
+  public PlatformTransactionManager transactionManager() {
+    JpaTransactionManager transactionManager
+        = new JpaTransactionManager();
+    transactionManager.setEntityManagerFactory(
+        entityManagerFactory);
+    return transactionManager;
+  }
+
+  @Bean
   public Job importUserJob(JobCompletionNotificationListener listener, Step step1) {
     return jobBuilderFactory.get("generateYearJob")
         .incrementer(new RunIdIncrementer())
@@ -95,9 +108,10 @@ public class PlanetsApplication extends DefaultBatchConfigurer {
   public Step step1(JpaItemWriter<Day> writer) {
     return stepBuilderFactory.get("step1")
         .<Long, Day>chunk(10)
-        .reader(reader())
+        .reader(reader(null, null))
         .processor(processor())
         .writer(writer)
+        .transactionManager(transactionManager())
         .build();
   }
 

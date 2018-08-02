@@ -12,10 +12,8 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class JobService {
@@ -26,10 +24,8 @@ public class JobService {
   @Autowired
   private Job generateYearJob;
 
-  @Value("${baseUrl}")
-  private String baseUrl;
-
-  public void runYearJob(Double ferengies, Double vulcanos, Double betasoides)
+  @Async
+  public void runYearJob(Double ferengies, Double vulcanos, Double betasoides, Long start, Long end)
       throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
     Map<Civilization, Double> parameters = new HashMap<>();
     parameters.put(Civilization.FERENGIES, ferengies);
@@ -39,15 +35,11 @@ public class JobService {
         .addDouble(Civilization.FERENGIES.name(), ferengies)
         .addDouble(Civilization.BETASOIDES.name(), betasoides)
         .addDouble(Civilization.VULCANOS.name(), vulcanos)
-        .addLong("time", System.currentTimeMillis()).toJobParameters();
+        .addLong("time", System.currentTimeMillis())
+        .addLong("start", start)
+        .addLong("end", end)
+        .toJobParameters();
     jobLauncher.run(generateYearJob, jobParameters);
   }
 
-  @Async
-  public void runYearJobAsync(Double ferengies, Double vulcanos, Double betasoides) {
-    final String uri = baseUrl + "/weather/generate/sync?ferengies=" + ferengies
-        + "&vulcanos=" + vulcanos + "&betasoides=" + betasoides;
-    RestTemplate restTemplate = new RestTemplate();
-    restTemplate.postForLocation(uri, "async");
-  }
 }

@@ -11,6 +11,7 @@ import com.maxi.planets.persistence.model.Civilization;
 import com.maxi.planets.persistence.model.Planet;
 import com.maxi.planets.persistence.repository.PlanetRepository;
 import java.math.BigDecimal;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,10 @@ public class PlanetService {
   public static final BigDecimal VALUE_OF_360 = BigDecimal.valueOf(360);
 
   public static final double ERROR_TOLERANCE = 0.05;
+
   @Autowired
   private PlanetRepository planetRepository;
+
 
   public double[] calculateFlatPosition(Planet planet, Long day) {
     BigDecimal circlePos = calculateCirclePosition(planet, day);
