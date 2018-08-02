@@ -27,6 +27,11 @@ public class JobService {
   @Async
   public void runYearJob(Double ferengies, Double vulcanos, Double betasoides, Long start, Long end)
       throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    runJob(ferengies, vulcanos, betasoides, start, end);
+  }
+
+  public void runJob(Double ferengies, Double vulcanos, Double betasoides, Long start, Long end)
+      throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
     Map<Civilization, Double> parameters = new HashMap<>();
     parameters.put(Civilization.FERENGIES, ferengies);
     parameters.put(Civilization.VULCANOS, vulcanos);
